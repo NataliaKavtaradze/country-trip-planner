@@ -35,6 +35,11 @@ const tripsSlice = createSlice({
     clearTrip: (state) => {
       state.selectedCountries = []
     },
+    loadTrip: (state, action: PayloadAction<string[]>) => {
+      state.selectedCountries = action.payload
+      state.savedTripsOpen = false
+      state.plannerOpen = true
+    },
   },
 })
 
@@ -44,6 +49,7 @@ export const {
   addCountryToTrip,
   removeCountryFromTrip,
   clearTrip,
+  loadTrip,
 } = tripsSlice.actions
 
 export default tripsSlice.reducer

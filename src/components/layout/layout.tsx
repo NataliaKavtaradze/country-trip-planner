@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom"
-import { DndContext, DragEndEvent } from "@dnd-kit/core"
+import { DndContext, type  DragEndEvent } from "@dnd-kit/core"
 import Header from "./Header"
 import Sidebar from "./Sidebar"
 import { useAppDispatch } from "../../app/hooks"

@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
+import type { Trip } from "./types"
 
 export const tripsApi = createApi({
   reducerPath: "tripsApi",
@@ -7,15 +8,19 @@ export const tripsApi = createApi({
   }),
   tagTypes: ["Trips"],
   endpoints: (builder) => ({
-    getTrips: builder.query({
+    getTrips: builder.query<Trip[], void>({
       query: () => "trips",
       providesTags: ["Trips"],
     }),
-    saveTrip: builder.mutation({
+
+    saveTrip: builder.mutation<Trip, Omit<Trip, "id">>({
       query: (trip) => ({
         url: "trips",
         method: "POST",
-        body: trip,
+        body: {
+          ...trip,
+          id: crypto.randomUUID(),
+        },
       }),
       invalidatesTags: ["Trips"],
     }),
