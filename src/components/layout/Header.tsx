@@ -1,3 +1,4 @@
+import { MapPin } from "lucide-react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { useAppDispatch } from "../../app/hooks"
 import { setPlannerOpen } from "../../features/trips/tripsSlice"
@@ -16,14 +17,20 @@ export default function Header() {
   }
 
   return (
-    <header className="flex items-center justify-between px-6 py-4 border-b border-white/10">
-      <h1 className="text-xl font-bold">Countries Explorer</h1>
+    <header className="sticky top-0 z-30 flex items-center justify-between border-b border-slate-200 bg-white px-6 py-4">
+      <button
+        onClick={() => navigate("/")}
+        className="flex items-center gap-2 text-sm font-semibold text-slate-800"
+      >
+        <MapPin className="h-4 w-4 text-blue-600" />
+        TravelPlanner
+      </button>
 
       <button
         onClick={handlePlanTrip}
-        className="rounded-xl bg-white text-black px-4 py-2 font-medium hover:opacity-90"
+        className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
       >
-        Plan a trip
+        Plan a Trip
       </button>
     </header>
   )

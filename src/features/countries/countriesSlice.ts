@@ -1,6 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit"
 
-type CountriesState = {
+export type CountriesState = {
   search: string
   region: string
   favoritesOnly: boolean
@@ -26,8 +26,8 @@ const countriesSlice = createSlice({
     setRegion: (state, action: PayloadAction<string>) => {
       state.region = action.payload
     },
-    toggleFavoritesOnly: (state) => {
-      state.favoritesOnly = !state.favoritesOnly
+    setFavoritesOnly: (state, action: PayloadAction<boolean>) => {
+      state.favoritesOnly = action.payload
     },
     setSelectedCountry: (state, action: PayloadAction<string | null>) => {
       state.selectedCountry = action.payload
@@ -41,7 +41,7 @@ const countriesSlice = createSlice({
 export const {
   setSearch,
   setRegion,
-  toggleFavoritesOnly,
+  setFavoritesOnly,
   setSelectedCountry,
   setModalOpen,
 } = countriesSlice.actions

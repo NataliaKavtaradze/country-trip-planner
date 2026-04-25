@@ -1,4 +1,4 @@
-import { createSlice, type PayloadAction } from "@reduxjs/toolkit"
+import { createSlice, type  PayloadAction } from "@reduxjs/toolkit"
 
 type FavoritesState = {
   items: string[]
@@ -14,11 +14,12 @@ const favoritesSlice = createSlice({
   reducers: {
     toggleFavorite: (state, action: PayloadAction<string>) => {
       const code = action.payload
-      const exists = state.items.includes(code)
 
-      state.items = exists
-        ? state.items.filter((item) => item !== code)
-        : [...state.items, code]
+      if (state.items.includes(code)) {
+        state.items = state.items.filter((item) => item !== code)
+      } else {
+        state.items.push(code)
+      }
     },
   },
 })

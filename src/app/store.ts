@@ -1,9 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit"
-import { countriesApi } from "../features/countries/countriesApi"
-import { tripsApi } from "../features/trips/tripsApi"
 import countriesReducer from "../features/countries/countriesSlice"
 import favoritesReducer from "../features/favorites/favoritesSlice"
 import tripsReducer from "../features/trips/tripsSlice"
+import { countriesApi } from "../features/countries/countriesApi"
+import { tripsApi } from "../features/trips/tripsApi"
 
 export const store = configureStore({
   reducer: {
@@ -14,7 +14,10 @@ export const store = configureStore({
     [tripsApi.reducerPath]: tripsApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(countriesApi.middleware, tripsApi.middleware),
+    getDefaultMiddleware().concat(
+      countriesApi.middleware,
+      tripsApi.middleware
+    ),
 })
 
 export type RootState = ReturnType<typeof store.getState>

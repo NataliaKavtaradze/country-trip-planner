@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom"
-import { DndContext, type  DragEndEvent } from "@dnd-kit/core"
+import { DndContext, type DragEndEvent } from "@dnd-kit/core"
 import Header from "./Header"
 import Sidebar from "./Sidebar"
 import { useAppDispatch } from "../../app/hooks"
@@ -20,10 +20,10 @@ export default function Layout() {
 
   return (
     <DndContext onDragEnd={handleDragEnd}>
-      <div className="min-h-screen bg-[#0B1020] text-white">
+      <div className="min-h-screen">
         <Header />
         <Sidebar />
-        <main className="px-6 py-8">
+        <main>
           <Outlet />
         </main>
       </div>
