@@ -1,3 +1,5 @@
+import { useDraggable } from "@dnd-kit/core"
+import { CSS } from "@dnd-kit/utilities"
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import {
   setModalOpen,
@@ -15,6 +17,14 @@ export default function CountryCard({ country }: CountryCardProps) {
   const favorites = useAppSelector((state) => state.favorites.items)
   const isFavorite = favorites.includes(country.cca3)
 
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id: country.cca3,
+  })
+
+  const style = {
+    transform: CSS.Translate.toString(transform),
+  }
+
   const handleOpenModal = () => {
     dispatch(setSelectedCountry(country.cca3))
     dispatch(setModalOpen(true))
@@ -22,8 +32,12 @@ export default function CountryCard({ country }: CountryCardProps) {
 
   return (
     <article
+      ref={setNodeRef}
+      style={style}
       onClick={handleOpenModal}
-      className="group cursor-pointer rounded-3xl overflow-hidden bg-white/5 border border-white/10 hover:border-white/20 transition-all duration-300 hover:-translate-y-1"
+      {...listeners}
+      {...attributes}
+      className="group cursor-grab active:cursor-grabbing rounded-3xl overflow-hidden bg-white/5 border border-white/10 hover:border-white/20 transition-all duration-300 hover:-translate-y-1"
     >
       <div className="aspect-[16/10] overflow-hidden">
         <img

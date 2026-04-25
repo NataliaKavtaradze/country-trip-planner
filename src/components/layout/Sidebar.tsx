@@ -1,15 +1,21 @@
+import { useGetCountriesQuery } from "../../features/countries/countriesApi"
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import {
   clearTrip,
   removeCountryFromTrip,
   setPlannerOpen,
 } from "../../features/trips/tripsSlice"
+import DropZone from "../trip/DropZone"
 
 export default function Sidebar() {
   const dispatch = useAppDispatch()
   const { plannerOpen, selectedCountries } = useAppSelector((state) => state.trips)
+  const { data } = useGetCountriesQuery()
 
   if (!plannerOpen) return null
+
+  const selectedCountryData =
+    data?.filter((country) => selectedCountries.includes(country.cca3)) ?? []
 
   return (
     <>
@@ -35,21 +41,31 @@ export default function Sidebar() {
             Drag countries here to build your trip itinerary.
           </p>
 
-          <div className="min-h-[220px] rounded-2xl border border-dashed border-white/15 bg-white/5 p-4">
-            {selectedCountries.length === 0 ? (
+          <DropZone>
+            {selectedCountryData.length === 0 ? (
               <div className="flex h-full min-h-[180px] items-center justify-center text-center text-white/40">
                 No countries selected yet
               </div>
             ) : (
               <div className="space-y-3">
-                {selectedCountries.map((code) => (
+                {selectedCountryData.map((country) => (
                   <div
-                    key={code}
-                    className="flex items-center justify-between rounded-2xl bg-white/5 px-4 py-3"
+                    key={country.cca3}
+                    className="flex items-center gap-3 rounded-2xl bg-white/5 px-4 py-3"
                   >
-                    <span>{code}</span>
+                    <img
+                      src={country.flags.png}
+                      alt={country.name.common}
+                      className="h-10 w-14 rounded-md object-cover"
+                    />
+
+                    <div className="flex-1">
+                      <p className="font-medium">{country.name.common}</p>
+                      <p className="text-xs text-white/50">{country.region}</p>
+                    </div>
+
                     <button
-                      onClick={() => dispatch(removeCountryFromTrip(code))}
+                      onClick={() => dispatch(removeCountryFromTrip(country.cca3))}
                       className="text-sm text-red-300 hover:text-red-200"
                     >
                       Remove
@@ -58,7 +74,7 @@ export default function Sidebar() {
                 ))}
               </div>
             )}
-          </div>
+          </DropZone>
 
           <div className="mt-6 flex gap-3">
             <button
