@@ -2,7 +2,7 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import {
   setRegion,
   setSearch,
-  toggleFavoritesOnly,
+  setFavoritesOnly,
 } from "../../features/countries/countriesSlice"
 
 const regions = ["All", "Africa", "Americas", "Asia", "Europe", "Oceania"]
@@ -37,7 +37,7 @@ export default function CountryFilters() {
         </select>
 
         <button
-          onClick={() => dispatch(toggleFavoritesOnly())}
+          onClick={() => dispatch(setFavoritesOnly(!favoritesOnly))}
           className={`rounded-2xl px-4 py-3 border transition ${
             favoritesOnly
               ? "bg-white text-black border-white"

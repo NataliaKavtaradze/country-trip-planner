@@ -47,30 +47,34 @@ export default function CountryCard({ country }: CountryCardProps) {
       onClick={handleOpenModal}
       className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-md"
     >
-      {/* Flag / drag handle only */}
-      <div
-        {...listeners}
-        {...attributes}
-        className="relative h-32 cursor-grab overflow-hidden active:cursor-grabbing"
-      >
-        <img
-          src={country.flags.png}
-          alt={country.name.common}
-          className="h-full w-full object-cover"
-        />
+      {/* Image wrapper */}
+      <div className="relative h-32 overflow-hidden">
+        {/* Drag handle only on image */}
+       <div
+  {...listeners}
+  {...attributes}
+  className="h-full w-full cursor-grab active:cursor-grabbing"
+>
+  <img
+    src={country.flags.png}
+    alt={country.name.common}
+    className="h-full w-full object-cover"
+  />
+</div>
 
-        <div className="absolute right-3 top-3 flex gap-2">
-          {/* Favorite */}
+        {/* Actions */}
+        <div className="absolute right-3 top-3 z-10 flex gap-2">
           <button
             type="button"
             onClick={(e) => {
               e.stopPropagation()
+              console.log("favorite clicked")
               dispatch(toggleFavorite(country.cca3))
-              }}
+            }}
             className={`flex h-8 w-8 items-center justify-center rounded-full transition ${
               isFavorite
                 ? "bg-red-500 text-white"
-                : "bg-white/90 text-slate-700 hover:bg-white"
+                : "bg-white text-slate-700 shadow-sm hover:bg-slate-50"
             }`}
           >
             <Heart
@@ -79,15 +83,13 @@ export default function CountryCard({ country }: CountryCardProps) {
             />
           </button>
 
-
-          {/* Add to trip */}
           <button
             type="button"
             onClick={(e) => {
               e.stopPropagation()
               dispatch(addCountryToTrip(country.cca3))
             }}
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-slate-700 transition hover:bg-white"
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-slate-700 shadow-sm hover:bg-slate-50"
           >
             <Plus className="h-4 w-4" />
           </button>
@@ -95,7 +97,7 @@ export default function CountryCard({ country }: CountryCardProps) {
       </div>
 
       {/* Content */}
-      <div className="cursor-pointer p-4">
+      <div className="p-4">
         <h3 className="text-lg font-semibold text-slate-900">
           {country.name.common}
         </h3>
@@ -121,6 +123,6 @@ export default function CountryCard({ country }: CountryCardProps) {
           {country.region}
         </span>
       </div>
-         </article>
+    </article>
   )
 }

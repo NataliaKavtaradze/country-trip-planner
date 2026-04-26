@@ -12,6 +12,13 @@ export const tripsApi = createApi({
       query: () => "trips",
       providesTags: ["Trips"],
     }),
+    deleteTrip: builder.mutation<void, string>({
+  query: (id) => ({
+    url: `/trips/${id}`,
+    method: "DELETE",
+  }),
+  invalidatesTags: ["Trips"],
+}),
 
     saveTrip: builder.mutation<Trip, Omit<Trip, "id">>({
       query: (trip) => ({
@@ -27,4 +34,8 @@ export const tripsApi = createApi({
   }),
 })
 
-export const { useGetTripsQuery, useSaveTripMutation } = tripsApi
+export const {
+  useGetTripsQuery,
+  useSaveTripMutation,
+  useDeleteTripMutation,
+} = tripsApi

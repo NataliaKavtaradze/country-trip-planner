@@ -1,7 +1,8 @@
 import { useDroppable } from "@dnd-kit/core"
+import type { ReactNode } from "react"
 
 type DropZoneProps = {
-  children: React.ReactNode
+  children: ReactNode
 }
 
 export default function DropZone({ children }: DropZoneProps) {
@@ -12,10 +13,8 @@ export default function DropZone({ children }: DropZoneProps) {
   return (
     <div
       ref={setNodeRef}
-      className={`min-h-[220px] rounded-2xl border border-dashed p-4 transition ${
-        isOver
-          ? "border-white bg-white/10"
-          : "border-white/15 bg-white/5"
+      className={`transition ${
+        isOver ? "scale-[1.01] opacity-100" : "opacity-100"
       }`}
     >
       {children}
