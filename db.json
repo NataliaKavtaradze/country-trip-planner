@@ -1,4 +1,24 @@
 {
-  "trips": [],
+  "trips": [
+    {
+      "title": "ზვზხვ",
+      "countries": [
+        "ALB",
+        "WLF",
+        "BEL"
+      ],
+      "createdAt": "2026-04-27T14:38:57.719Z",
+      "id": "NAEBN3wmf00"
+    },
+    {
+      "title": "ზცვზცვზ",
+      "countries": [
+        "IRN",
+        "WLF"
+      ],
+      "createdAt": "2026-04-27T14:40:32.502Z",
+      "id": "s0lY7jjzL-o"
+    }
+  ],
   "$schema": "./node_modules/json-server/schema.json"
 }

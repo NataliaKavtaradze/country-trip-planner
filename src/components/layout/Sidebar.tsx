@@ -1,20 +1,18 @@
 import { useState } from "react"
+import { Trash2, X } from "lucide-react"
+import { useGetCountriesQuery } from "../../features/countries/countriesApi"
 import {
-  CalendarDays,
-  Trash2,
-  X,
-  GripVertical,
-  Check,
-} from "lucide-react"
+  useGetTripsQuery,
+  useSaveTripMutation,
+} from "../../features/trips/tripsApi"
 
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
-import { useGetCountriesQuery } from "../../features/countries/countriesApi"
-import { useDeleteTripMutation, useGetTripsQuery, useSaveTripMutation } from "../../features/trips/tripsApi"
 import {
   clearTrip,
   removeCountryFromTrip,
   setPlannerOpen,
 } from "../../features/trips/tripsSlice"
+
 import DropZone from "../trip/DropZone"
 import SavedTrips from "../trip/SavedTrips"
 
@@ -22,65 +20,65 @@ export default function Sidebar() {
   const dispatch = useAppDispatch()
   const { plannerOpen, selectedCountries } = useAppSelector((state) => state.trips)
 
-  const { data } = useGetCountriesQuery()
-  const { data: savedTrips } = useGetTripsQuery()
+  const [tripName, setTripName] = useState("")
+
+  const { data: countries = [] } = useGetCountriesQuery()
+  const { data: savedTrips = [] } = useGetTripsQuery()
   const [saveTrip, { isLoading }] = useSaveTripMutation()
 
-  const [showSaveInput, setShowSaveInput] = useState(false)
-  const [tripName, setTripName] = useState("")
-  const [deleteTrip] = useDeleteTripMutation()
   if (!plannerOpen) return null
 
-  const selectedCountryData =
-    data?.filter((country) => selectedCountries.includes(country.cca3)) ?? []
+  const selectedCountryData = countries.filter((country) =>
+    selectedCountries.includes(country.cca3)
+  )
 
-  const handleSaveTrip = async () => {
+  const handleSave = async () => {
     if (!selectedCountries.length || !tripName.trim()) return
 
-    await saveTrip({
-      title: tripName,
-      countries: selectedCountries,
-      createdAt: new Date().toISOString(),
-    })
+    try {
+      await saveTrip({
+        title: tripName,
+        countries: selectedCountries,
+        createdAt: new Date().toISOString(),
+      }).unwrap()
 
-    setTripName("")
-    setShowSaveInput(false)
-    dispatch(clearTrip())
+      setTripName("")
+      dispatch(clearTrip())
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   return (
     <>
-      {/* Backdrop only on left side */}
       <div
-        className="fixed inset-y-0 left-0 right-[360px] z-40 bg-black/30"
+        className="fixed inset-0 z-40 bg-black/30"
         onClick={() => dispatch(setPlannerOpen(false))}
       />
 
-      {/* Interactive Sidebar */}
-      <aside className="fixed right-0 top-0 z-50 flex h-screen w-[360px] flex-col bg-white shadow-2xl">
-        <div className="flex items-center justify-between bg-blue-600 px-4 py-4 text-white">
+      <aside className="fixed right-0 top-0 z-50 h-full w-full max-w-md overflow-y-auto bg-white shadow-2xl">
+        {/* Header */}
+        <div className="flex items-center justify-between bg-blue-600 px-5 py-4 text-white">
           <div>
-            <h2 className="text-sm font-semibold">Trip Planner</h2>
-            <p className="mt-1 text-[11px] text-blue-100">
+            <h2 className="text-lg font-semibold">Trip Planner</h2>
+            <p className="text-xs text-blue-100">
               Drag countries here to add them to your trip
             </p>
           </div>
 
-          <button
-            onClick={() => dispatch(setPlannerOpen(false))}
-            className="rounded-md p-1 hover:bg-white/10"
-          >
-            <X className="h-4 w-4" />
+          <button onClick={() => dispatch(setPlannerOpen(false))}>
+            <X className="h-5 w-5" />
           </button>
         </div>
 
-        <div className="flex flex-1 flex-col overflow-y-auto p-4">
+        <div className="p-4">
+          {/* Current Trip */}
           <DropZone>
-            <div className="rounded-2xl border border-dashed border-blue-300 bg-blue-50 p-3">
+            <div className="rounded-2xl border border-dashed border-blue-300 bg-slate-50 p-3">
               <div className="mb-3 flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-slate-800">Current Trip</h3>
+                <h3 className="font-medium text-slate-800">Current Trip</h3>
 
-                {!!selectedCountries.length && (
+                {selectedCountryData.length > 0 && (
                   <button
                     onClick={() => dispatch(clearTrip())}
                     className="text-xs text-red-500 hover:text-red-600"
@@ -90,8 +88,8 @@ export default function Sidebar() {
                 )}
               </div>
 
-              {!selectedCountryData.length ? (
-                <div className="flex min-h-[180px] items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white text-sm text-slate-400">
+              {selectedCountryData.length === 0 ? (
+                <div className="py-10 text-center text-sm text-slate-400">
                   Drag countries here
                 </div>
               ) : (
@@ -99,26 +97,24 @@ export default function Sidebar() {
                   {selectedCountryData.map((country) => (
                     <div
                       key={country.cca3}
-                      className="flex items-center gap-3 rounded-xl bg-white px-3 py-2 shadow-sm"
+                      className="flex items-center gap-3 rounded-xl bg-white px-3 py-2"
                     >
-                      <GripVertical className="h-4 w-4 text-slate-300" />
-
                       <img
                         src={country.flags.png}
                         alt={country.name.common}
-                        className="h-6 w-8 rounded object-cover"
+                        className="h-8 w-10 rounded object-cover"
                       />
 
                       <div className="flex-1">
-                        <p className="text-sm font-medium text-slate-800">
-                          {country.name.common}
-                        </p>
+                        <p className="text-sm font-medium">{country.name.common}</p>
                         <p className="text-xs text-slate-500">{country.region}</p>
                       </div>
 
                       <button
-                        onClick={() => dispatch(removeCountryFromTrip(country.cca3))}
-                        className="text-slate-400 hover:text-red-500"
+                        onClick={() =>
+                          dispatch(removeCountryFromTrip(country.cca3))
+                        }
+                        className="text-red-400 hover:text-red-600"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -129,68 +125,45 @@ export default function Sidebar() {
             </div>
           </DropZone>
 
-          {showSaveInput ? (
-            <div className="mt-4 flex gap-2">
-              <input
-                autoFocus
-                type="text"
-                value={tripName}
-                onChange={(e) => setTripName(e.target.value)}
-                placeholder="Enter trip name"
-                className="h-11 flex-1 rounded-lg border border-slate-200 px-3 text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:border-blue-500"
-              />
+          {/* Save Trip */}
+          <div className="mt-4">
+            <input
+  type="text"
+  value={tripName}
+  onChange={(e) => setTripName(e.target.value)}
+  placeholder="Enter trip name"
+  className="h-11 w-full rounded-xl border border-slate-300 bg-white px-4 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-blue-500"
+/>
+
+            <div className="mt-2 flex gap-2">
               <button
-                onClick={handleSaveTrip}
-                disabled={!tripName.trim() || isLoading}
-                className="flex h-11 w-11 items-center justify-center rounded-lg bg-green-600 text-white disabled:opacity-50"
+                onClick={handleSave}
+                disabled={!tripName.trim() || !selectedCountries.length || isLoading}
+              className={`flex-1 rounded-xl px-4 py-2 text-sm font-medium text-white transition ${
+  tripName.trim() && selectedCountries.length
+    ? "bg-blue-600 hover:bg-blue-700"
+    : "bg-slate-300 cursor-not-allowed"
+}`}
               >
-                <Check className="h-4 w-4" />
+                {isLoading ? "Saving..." : "Save"}
+              </button>
+
+              <button
+                onClick={() => {
+                  setTripName("")
+                  dispatch(clearTrip())
+                }}
+                className="rounded-xl border border-slate-300 px-4 py-2 text-sm text-slate-700"
+              >
+                Cancel
               </button>
             </div>
-          ) : (
-            <button
-              onClick={() => setShowSaveInput(true)}
-              disabled={!selectedCountries.length}
-              className="mt-5 flex h-11 items-center justify-center gap-2 rounded-lg bg-green-600 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50"
-            >
-              <CalendarDays className="h-4 w-4" />
-              Save Trip
-            </button>
-          )}
+          </div>
 
+          {/* Saved Trips */}
           <div className="mt-6">
-            <h3 className="mb-3 text-sm font-semibold text-slate-800">Saved Trips</h3>
-             <SavedTrips />
-            {!savedTrips?.length ? (
-              <div className="rounded-xl border border-slate-200 py-10 text-center text-sm text-slate-400">
-                No saved trips yet
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {savedTrips.map((trip) => (
-                  <div key={trip.id} className="rounded-xl border border-slate-200 p-3">
-                    <p className="font-medium text-slate-800">{trip.title}</p>
-                    <p className="mt-1 text-xs text-slate-500">
-                      {trip.countries.length} countries
-                    </p>
-
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      {trip.countries.map((code) => {
-                        const country = data?.find((c) => c.cca3 === code)
-                        return country ? (
-                          <span
-                            key={code}
-                            className="rounded-full bg-slate-100 px-2 py-1 text-xs text-slate-600"
-                          >
-                            {country.name.common}
-                          </span>
-                        ) : null
-                      })}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            <h3 className="mb-3 font-medium text-slate-800">Saved Trips</h3>
+            <SavedTrips tripsCount={savedTrips.length} />
           </div>
         </div>
       </aside>
