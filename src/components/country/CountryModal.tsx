@@ -1,29 +1,43 @@
-import { X, Heart, Plus, MapPin, Globe, Users, Clock, Coins } from "lucide-react"
+import {
+  X,
+  Heart,
+  Plus,
+  MapPin,
+  Globe,
+  Users,
+  Clock,
+  Coins,
+} from "lucide-react"
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
-import { closeModal } from "../../features/countries/countriesSlice"
-import { addFavorite, removeFavorite } from "../../features/favorites/favoritesSlice"
+import {
+  setModalOpen,
+  setSelectedCountry,
+} from "../../features/countries/countriesSlice"
+import { toggleFavorite } from "../../features/favorites/favoritesSlice"
 import { addCountryToTrip } from "../../features/trips/tripsSlice"
-import type { Country } from "../../types/country"
 
 type CountryModalProps = {
-  country: Country
+  country: any
 }
 
 export default function CountryModal({ country }: CountryModalProps) {
   const dispatch = useAppDispatch()
 
-  const { favorites } = useAppSelector((state) => state.favorites)
-  const { selectedCountries } = useAppSelector((state) => state.trips)
+  if (!country) return null
 
-  const isFavorite = favorites.includes(country.cca3)
+  const favoriteCodes = useAppSelector((state) => state.favorites.items)
+  const selectedCountries = useAppSelector((state) => state.trips.selectedCountries)
+
+  const isFavorite = favoriteCodes.includes(country.cca3)
   const isInTrip = selectedCountries.includes(country.cca3)
 
+  const handleClose = () => {
+    dispatch(setModalOpen(false))
+    dispatch(setSelectedCountry(null))
+  }
+
   const handleFavorite = () => {
-    if (isFavorite) {
-      dispatch(removeFavorite(country.cca3))
-    } else {
-      dispatch(addFavorite(country.cca3))
-    }
+    dispatch(toggleFavorite(country.cca3))
   }
 
   const handleAddToTrip = () => {
@@ -33,11 +47,17 @@ export default function CountryModal({ country }: CountryModalProps) {
   }
 
   return (
-    <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/40 px-4">
-      <div className="relative w-full max-w-2xl overflow-hidden rounded-3xl bg-white shadow-2xl">
+    <div
+      onClick={handleClose}
+      className="fixed inset-0 z-[80] flex items-center justify-center bg-black/40 px-4"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-2xl overflow-hidden rounded-3xl bg-white shadow-2xl"
+      >
         {/* Close */}
         <button
-          onClick={() => dispatch(closeModal())}
+          onClick={handleClose}
           className="absolute right-4 top-4 z-10 rounded-full bg-white/90 p-2 shadow hover:bg-white"
         >
           <X className="h-5 w-5 text-slate-700" />
@@ -94,22 +114,25 @@ export default function CountryModal({ country }: CountryModalProps) {
             label="Region"
             value={`${country.region}${country.subregion ? ` • ${country.subregion}` : ""}`}
           />
+
           <InfoItem
             icon={<Coins className="h-4 w-4 text-yellow-500" />}
             label="Currency"
             value={
               country.currencies
                 ? Object.values(country.currencies)
-                    .map((c) => `${c.name} (${c.symbol ?? ""})`)
+                    .map((c: any) => `${c.name} (${c.symbol ?? ""})`)
                     .join(", ")
                 : "N/A"
             }
           />
+
           <InfoItem
             icon={<MapPin className="h-4 w-4 text-indigo-500" />}
             label="Capital"
             value={country.capital?.[0] || "N/A"}
           />
+
           <InfoItem
             icon={<Globe className="h-4 w-4 text-violet-500" />}
             label="Languages"
@@ -119,11 +142,13 @@ export default function CountryModal({ country }: CountryModalProps) {
                 : "N/A"
             }
           />
+
           <InfoItem
             icon={<Users className="h-4 w-4 text-green-500" />}
             label="Population"
             value={country.population.toLocaleString()}
           />
+
           <InfoItem
             icon={<Clock className="h-4 w-4 text-red-500" />}
             label="Timezones"

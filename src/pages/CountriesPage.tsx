@@ -12,11 +12,17 @@ export default function CountriesPage() {
   const dispatch = useAppDispatch()
   const [searchParams, setSearchParams] = useSearchParams()
 
-  const { data, isLoading, isError } = useGetCountriesQuery()
-  const { search, region, favoritesOnly } = useAppSelector(
-    (state) => state.countries
-  )
-  const favorites = useAppSelector((state) => state.favorites.items)
+  const { data: countries = [], isLoading, isError } = useGetCountriesQuery()
+
+  const {
+    search,
+    region,
+    favoritesOnly,
+    selectedCountry,
+    isModalOpen,
+  } = useAppSelector((state) => state.countries)
+
+  const favoriteCodes = useAppSelector((state) => state.favorites.items)
 
   useEffect(() => {
     if (searchParams.get("planner") === "open") {
@@ -26,31 +32,50 @@ export default function CountriesPage() {
   }, [dispatch, searchParams, setSearchParams])
 
   if (isLoading) {
-    return <section className="min-h-screen bg-[#F8FAFC] px-6 py-8">Loading...</section>
+    return (
+      <section className="min-h-screen bg-[#F8FAFC] px-6 py-8">
+        Loading...
+      </section>
+    )
   }
 
   if (isError) {
-    return <section className="min-h-screen bg-[#F8FAFC] px-6 py-8">Error...</section>
+    return (
+      <section className="min-h-screen bg-[#F8FAFC] px-6 py-8">
+        Error...
+      </section>
+    )
   }
 
-  const filteredCountries =
-    data?.filter((country) => {
-      const matchesSearch = country.name.common
-        .toLowerCase()
-        .includes(search.toLowerCase())
+  const filteredCountries = countries.filter((country) => {
+    const matchesSearch = country.name.common
+      .toLowerCase()
+      .includes(search.toLowerCase())
 
-      const matchesRegion = region === "All" || country.region === region
-      const matchesFavorites = !favoritesOnly || favorites.includes(country.cca3)
+    const matchesRegion = region === "All" || country.region === region
+    const matchesFavorites =
+      !favoritesOnly || favoriteCodes.includes(country.cca3)
 
-      return matchesSearch && matchesRegion && matchesFavorites
-    }) ?? []
+    return matchesSearch && matchesRegion && matchesFavorites
+  })
+
+  const activeCountry = countries.find(
+    (country) => country.cca3 === selectedCountry
+  )
 
   return (
     <section className="min-h-screen bg-[#F8FAFC] px-6 py-8 text-slate-900">
       <div className="mx-auto max-w-7xl">
-        <CountryFilters total={data?.length ?? 0} filtered={filteredCountries.length} />
+        <CountryFilters
+          total={countries.length}
+          filtered={filteredCountries.length}
+        />
+
         <CountryGrid countries={filteredCountries} />
-        <CountryModal />
+
+        {isModalOpen && activeCountry && (
+          <CountryModal country={activeCountry} />
+        )}
       </div>
     </section>
   )
