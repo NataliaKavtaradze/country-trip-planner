@@ -56,7 +56,7 @@ export default function Sidebar() {
         onClick={() => dispatch(setPlannerOpen(false))}
       />
 
-      <aside className="fixed right-0 top-0 z-50 h-full w-full max-w-md overflow-y-auto bg-white shadow-2xl">
+      <aside className="fixed right-0 top-0 z-[70] h-screen w-full max-w-[360px] overflow-hidden border-l border-slate-200 bg-white shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between bg-blue-600 px-5 py-4 text-white">
           <div>
